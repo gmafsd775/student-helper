@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyAI - Intelligent Study Assistance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-graduation-cap"></i> StudyAI</h1>
+            <p>Intelligent study assistance powered by AI</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="card">
+                    <h2><i class="fas fa-file-upload"></i> Upload Your File</h2>
+                    <div class="upload-area" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drag & drop your file here</h3>
+                        <p>Supported formats: JPG, PNG, PDF</p>
+                        <button class="btn" id="selectFileBtn">
+                            <i class="fas fa-file"></i> Select File
+                        </button>
+                        <input type="file" id="fileInput" hidden accept=".jpg,.jpeg,.png,.pdf">
+                    </div>
+                    <div id="fileInfo" class="file-info" style="display: none;">
+                        <i class="fas fa-file"></i>
+                        <span id="fileName">No file selected</span>
+                    </div>
+                    <div class="processing" id="fileProcessing" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Processing your file...</p>
+                        <div class="progress-bar">
+                            <div class="progress" id="uploadProgress"></div>
+                        </div>
+                        <p id="uploadStatus">Uploading to Azure OCR...</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-tasks"></i> Processing Results</h2>
+                    <div class="tab-navigation">
+                        <button class="tab-btn active" data-tab="extracted-text">
+                            <i class="fas fa-font"></i> Extracted Text
+                        </button>
+                        <button class="tab-btn" data-tab="summary">
+                            <i class="fas fa-file-alt"></i> Summary
+                        </button>
+                        <button class="tab-btn" data-tab="qa">
+                            <i class="fas fa-question-circle"></i> Q&A
+                        </button>
+                        <button class="tab-btn" data-tab="urdu">
+                            <i class="fas fa-language"></i> Urdu Translation
+                        </button>
+                    </div>
+                    
+                    <div class="tab-content active" id="extracted-text">
+                        <h3>Extracted Text:</h3>
+                        <div class="results" id="extractedText">
+                            Upload a file to see extracted text here...
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="summary">
+                        <h3>Summary:</h3>
+                        <div class="summary-content" id="summaryContent">
+                            Summary will appear here after processing...
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="qa">
+                        <h3>Questions & Answers:</h3>
+                        <div class="qa-content" id="qaContent">
+                            Q&A will appear here after processing...
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="urdu">
+                        <h3>Urdu Translation:</h3>
+                        <div class="urdu-content" id="urduContent">
+                            Urdu translation will appear here after processing...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="card">
+                    <h2><i class="fas fa-robot"></i> Study Assistant</h2>
+                    <div class="teacher-info">
+                        <img src="{{ url_for('static', filename='img/teacher.jpg') }}" alt="Teacher" class="avatar" onerror="this.src='https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80'">
+                        <div>
+                            <h3>AI Tutor</h3>
+                            <p>Ready to help you study!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message bot-message">
+                                Hello! I'm your StudyAI assistant. Upload a file to get started, or ask me anything about your studies!
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Type your message here...">
+                            <button class="btn" id="sendMessageBtn">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-question-circle"></i> MCQ Quiz</h2>
+                    <div id="mcqContainer">
+                        <p>MCQs will be generated here after text extraction. Upload a file to get started.</p>
+                    </div>
+                    
+                    <div class="processing" id="processingMCQ" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Generating MCQs from your content...</p>
+                    </div>
+                    
+                    <button class="btn btn-success" id="submitQuizBtn" style="display: none; margin-top: 15px;">
+                        <i class="fas fa-check-circle"></i> Submit Answers
+                    </button>
+                    
+                    <div class="score-container" id="scoreContainer" style="display: none;">
+                        <h2><i class="fas fa-trophy"></i> Quiz Results</h2>
+                        <p>Your score:</p>
+                        <div class="score-value" id="scoreValue">0</div>
+                        <p>out of <span id="totalQuestions">0</span> questions</p>
+                        <div id="answerReview"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 StudyAI. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <div>
+            <h4 id="notificationTitle">Success</h4>
+            <p id="notificationMessage">Operation completed successfully</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+</body>
+</html>
